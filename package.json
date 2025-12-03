@@ -10,13 +10,6 @@
     "preview": "vite preview",
     "test": "vitest run"
   },
-  "scripts": {
-    "test": "vitest",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:ui": "vitest --ui",
-    "coverage": "vitest run --coverage"
-  },
   "dependencies": {
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
