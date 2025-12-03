@@ -1,0 +1,73 @@
+name: SonarQube Analysis
+on: workflow_dispatch
+
+jobs:
+  sonarqube-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Create sonar-project.properties file
+        run: |
+          echo "=== Creating sonar-project.properties ==="
+          cat > sonar-project.properties << EOF
+          # Required properties
+          sonar.projectKey=faizreza_${{ github.event.repository.name }}
+          sonar.organization=faizreza
+          
+          # Analysis configuration
+          sonar.host.url=https://sonarcloud.io
+          sonar.scanner.mode=CI
+          
+          # Source code
+          sonar.sources=src
+          sonar.tests=tests
+          sonar.sourceEncoding=UTF-8
+          
+          # JavaScript/TypeScript specific
+          sonar.javascript.lcov.reportPaths=coverage/lcov.info
+          
+          # Project metadata
+          sonar.projectName=${{ github.event.repository.name }}
+          sonar.projectVersion=1.0
+          EOF
+          
+          echo "=== File created with content: ==="
+          cat sonar-project.properties
+      
+      - name: Run tests with coverage
+        run: |
+          npm test -- --coverage --watchAll=false
+          echo "Checking coverage file..."
+          ls -la coverage/ || echo "No coverage directory"
+          find . -name "lcov.info" || echo "No lcov.info found"
+      
+      - name: Install SonarQube Scanner
+        run: npm install -g sonarqube-scanner
+      
+      - name: Run SonarQube Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          echo "=== Starting SonarQube Analysis ==="
+          echo "Using properties from sonar-project.properties"
+          echo "Project Key: faizreza_${{ github.event.repository.name }}"
+          echo "Organization: faizreza"
+          echo ""
+          
+          # Run scanner with explicit parameters AND properties file
+          sonar-scanner \
+            -Dproject.settings=sonar-project.properties \
+            -Dsonar.login=$SONAR_TOKEN
