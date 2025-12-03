@@ -55,9 +55,9 @@ jobs:
           echo "Project Key: $SONAR_PROJECT_KEY"
           echo "Organization: $SONAR_ORG"
           echo "Sonar Host: $SONAR_HOST_URL"
-          npx sonarqube-scanner \
           
-          -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+          npx sonarqube-scanner \
+            -Dsonar.projectKey=$SONAR_PROJECT_KEY \
             -Dsonar.organization=$SONAR_ORG \
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
             -Dsonar.host.url=$SONAR_HOST_URL \
